@@ -1,9 +1,21 @@
 package com.zth;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.exceptions.AlgorithmMismatchException;
+import com.auth0.jwt.exceptions.SignatureVerificationException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
+import com.auth0.jwt.interfaces.Claim;
+import com.auth0.jwt.interfaces.DecodedJWT;
+import com.zth.entity.User;
 import com.zth.mapper.UserMapper;
+import com.zth.utils.JWTUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @SpringBootTest
 class MybatisplusDemoApplicationTests {
@@ -14,6 +26,61 @@ class MybatisplusDemoApplicationTests {
     @Test
     void getUser() {
         System.out.println(userMapper.selectList(null));
+        Map map = new HashMap();
+        map.put("username", "zhangsan");
+        map.put("password", "123");
+        List list = userMapper.selectByMap(map);
+        User user = (User) list.get(0);
+        String token = JWTUtils.getToken(map);
+        System.out.println(token);
+        System.out.println("verify是：");
+//        DecodedJWT verify = JWTUtils.verify(token);
+//        System.out.println(verify.getHeader());
+//        System.out.println(verify.getPayload());
+//        System.out.println(verify.getSignature());
+//        System.out.println(verify.getToken());
+
+        System.out.println("试试一个错误的token");
+        String token1 = token + "pppp";
+        try {
+            DecodedJWT verify1 = JWTUtils.verify(token1);
+        } catch (SignatureVerificationException e) {
+            //e.printStackTrace();
+            map.put("msg", "无效签名");
+        } catch (TokenExpiredException e) {
+            //e.printStackTrace();
+            map.put("msg", "token过期");
+        } catch (AlgorithmMismatchException e) {
+            //e.printStackTrace();
+            map.put("msg", "token算法不一致");
+        } catch (Exception e) {
+            //e.printStackTrace();
+            map.put("msg", "token无效");
+        }
+        map.put("state", "flase");
+        System.out.println(map);
+
     }
 
+    @Test
+    void loginTest() {
+        Map map = new HashMap();
+        map.put("username", "zhangsan");
+        map.put("password", "123");
+        List list = userMapper.selectByMap(map);
+        User user = (User) list.get(0);
+        System.out.println(user);
+    }
+
+    @Test
+    void getParamByTokenTest() {
+        Map map = new HashMap();
+        map.put("id","10001");
+        map.put("username", "zhangsan");
+        map.put("password", "123");
+        String token = JWTUtils.getToken(map);
+        System.out.println(JWTUtils.verify(token));
+        Claim id = JWTUtils.verify(token).getClaim("id");
+        System.out.println(id.asString());
+    }
 }

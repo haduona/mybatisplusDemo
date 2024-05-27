@@ -9,3 +9,10 @@ spring:
       password: 123456
 server:
   port: 8080
+
+coisini:
+  security:
+    jwt-key: coisini
+    # 过期时间
+    token-expired-in: 86400000
+

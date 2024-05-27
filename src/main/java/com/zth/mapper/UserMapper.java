@@ -7,6 +7,6 @@ import org.apache.ibatis.annotations.Mapper;
 
 
 @Mapper
-@TableName("user")
+@TableName("tb_user")
 public interface UserMapper extends BaseMapper<User> {
 }
