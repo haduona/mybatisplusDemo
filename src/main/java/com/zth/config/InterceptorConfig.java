@@ -9,9 +9,8 @@ public class InterceptorConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new JWTInterceptor())
                 //拦截
-                .addPathPatterns("/user/test")
+                .addPathPatterns("/**")
                 //放行
-                .excludePathPatterns("/user/login")
-                .excludePathPatterns("/user/getUser");
+                .excludePathPatterns("/admin/register","/user/login", "/admin/login");
     }
 }

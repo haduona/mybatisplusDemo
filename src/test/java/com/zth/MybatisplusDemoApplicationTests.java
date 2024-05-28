@@ -6,7 +6,12 @@ import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.zth.common.IdentityEnum;
+import com.zth.entity.Admin;
+import com.zth.entity.People;
 import com.zth.entity.User;
+import com.zth.mapper.AdminMapper;
+import com.zth.mapper.PeopleMapper;
 import com.zth.mapper.UserMapper;
 import com.zth.utils.JWTUtils;
 import org.junit.jupiter.api.Test;
@@ -22,6 +27,38 @@ class MybatisplusDemoApplicationTests {
 
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private PeopleMapper peopleMapper;
+
+    @Autowired
+    private AdminMapper adminMapper;
+
+    @Test
+    void adminTest() {
+        List<Admin> list = adminMapper.selectList(null);
+        System.out.println(list);
+    }
+
+
+
+
+    @Test
+    void peopleTest() {
+
+        List<People> people = peopleMapper.selectList(null);
+        System.out.println(people);
+        IdentityEnum identity = people.get(0).getIdentity();
+        System.out.println(identity);
+        if(identity == IdentityEnum.ADMIN) {
+            System.out.println("管理员");
+        }
+        else {
+            System.out.println("其他");
+        }
+
+    }
+
+
 
     @Test
     void getUser() {
@@ -31,7 +68,7 @@ class MybatisplusDemoApplicationTests {
         map.put("password", "123");
         List list = userMapper.selectByMap(map);
         User user = (User) list.get(0);
-        String token = JWTUtils.getToken(map);
+        String token = JWTUtils.generateToken(map);
         System.out.println(token);
         System.out.println("verify是：");
 //        DecodedJWT verify = JWTUtils.verify(token);
@@ -78,7 +115,7 @@ class MybatisplusDemoApplicationTests {
         map.put("id","10001");
         map.put("username", "zhangsan");
         map.put("password", "123");
-        String token = JWTUtils.getToken(map);
+        String token = JWTUtils.generateToken(map);
         System.out.println(JWTUtils.verify(token));
         Claim id = JWTUtils.verify(token).getClaim("id");
         System.out.println(id.asString());

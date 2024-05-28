@@ -1,19 +1,19 @@
 package com.zth.controller;
 
+import com.alibaba.druid.util.StringUtils;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.zth.common.IdentityEnum;
 import com.zth.entity.User;
 import com.zth.service.IUserService;
 import com.zth.utils.JWTUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.management.Query;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/user")
@@ -22,16 +22,26 @@ public class UserController {
     @Autowired
     public IUserService userService;
 
-    @GetMapping("/getUser")
+    /**
+     * 查询所有用户
+     * @return
+     */
+    @GetMapping("/getUsers")
     public JSONObject getUser() {
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("code",1);
-        jsonObject.put("msg","success");
+        jsonObject.put("code", 1);
+        jsonObject.put("msg", "success");
         List<User> users = userService.list(null);
-        jsonObject.put("data",users);
+        jsonObject.put("data", users);
         return jsonObject;
     }
 
+
+    /**
+     * 登录
+     * @param user
+     * @return
+     */
     @PostMapping("/login")
     public JSONObject login(@RequestBody User user) {
         JSONObject jsonObject = new JSONObject();
@@ -48,12 +58,77 @@ public class UserController {
             return jsonObject;
         }
         //查询成功
-        String token = getToken(user1);
+        String token = JWTUtils.getToken(user1);
         jsonObject.put("code",1);
         jsonObject.put("msg","查询成功");
         jsonObject.put("token",token);
         return jsonObject;
     }
+
+
+    //对user的增删改查
+
+    /**
+     * 添加用户
+     * @param user
+     * @return
+     */
+    @PostMapping("/addUser")
+    public JSONObject addUser(@RequestBody User user) {
+        JSONObject jsonObject = new JSONObject();
+        user.setIdentity(IdentityEnum.USER);
+        if (userService.save(user)) {
+            jsonObject.put("code", 1);
+            jsonObject.put("msg", "添加成功");
+            return jsonObject;
+        } else {
+            jsonObject.put("code", 0);
+            jsonObject.put("msg", "添加失败");
+            return jsonObject;
+        }
+    }
+
+
+    /**
+     * 删除用户
+     * @param user
+     * @return
+     */
+    @PostMapping("/deleteUser")
+    public JSONObject deleteUser(@RequestBody User user) {
+        JSONObject jsonObject = new JSONObject();
+
+        if (userService.removeById(user.getId())) {
+            jsonObject.put("code", 1);
+            jsonObject.put("msg", "删除成功");
+            return jsonObject;
+        } else {
+            jsonObject.put("code", 0);
+            jsonObject.put("msg", "删除失败");
+            return jsonObject;
+        }
+    }
+
+    /**
+     * 修改用户信息
+     * @param user
+     * @return
+     */
+    @PostMapping("/updateUser")
+    public JSONObject updateUser(@RequestBody User user) {
+        JSONObject jsonObject = new JSONObject();
+        if (userService.updateById(user)) {
+            jsonObject.put("code", 1);
+            jsonObject.put("msg", "修改成功");
+            return jsonObject;
+        } else {
+            jsonObject.put("code", 0);
+            jsonObject.put("msg", "修改失败");
+            return jsonObject;
+        }
+    }
+
+
 
     @PostMapping("/tokentest")
     public JSONObject tokentest(HttpServletRequest request) {
@@ -62,23 +137,12 @@ public class UserController {
         System.out.println("需要验证token的函数执行了...");
         String token = request.getHeader("token");
         String userId = JWTUtils.getUserId(token);
-        jsonObject.put("userId",userId);
-        jsonObject.put("state",true);
-        jsonObject.put("token",token);
-        jsonObject.put("msg","请求成功");
+        jsonObject.put("userId", userId);
+        jsonObject.put("state", true);
+        jsonObject.put("token", token);
+        jsonObject.put("msg", "请求成功");
         return jsonObject;
 
-    }
-
-
-
-    public String getToken(User user) {
-        Map map = new HashMap();
-        map.put("id",user.getId().toString());
-        map.put("username",user.getUsername());
-        map.put("password",user.getPassword());
-        String token = JWTUtils.getToken(map);
-        return token;
     }
 
 }
