@@ -6,6 +6,10 @@ import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.zth.common.IdentityEnum;
 import com.zth.entity.Admin;
 import com.zth.entity.People;
@@ -32,6 +36,42 @@ class MybatisplusDemoApplicationTests {
 
     @Autowired
     private AdminMapper adminMapper;
+
+
+
+
+
+    /**
+     * 分页插件测试
+     */
+    @Test
+    void fenyeTest() {
+
+        System.out.println("--------------");
+        System.out.println(peopleMapper.selectList(null));
+        System.out.println("--------------");
+
+        System.out.println("第一批数据");
+        IPage<People> peopleIPage = peopleMapper.selectPageVo(new Page<>(1, 5));
+        List<People> records = peopleIPage.getRecords();
+        for (People people : records) {
+            System.out.println(people);
+        }
+        System.out.println("第二批数据");
+        IPage<People> peopleIPage1 = peopleMapper.selectPageVo(new Page<>(2, 5));
+        List<People> records1 = peopleIPage1.getRecords();
+        for (People people : records1) {
+            System.out.println(people);
+        }
+        System.out.println("第三批数据");
+        IPage<People> peopleIPage2 = peopleMapper.selectPageVo(new Page<>(3, 5));
+        List<People> records2 = peopleIPage2.getRecords();
+        for (People people : records2) {
+            System.out.println(people);
+        }
+
+    }
+
 
     @Test
     void adminTest() {

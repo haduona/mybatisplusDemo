@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zth.mapper.PeopleMapper">
+
+    <!-- 根据ID获取用户信息 -->
+    <select id="selectPageVo" resultType="com.zth.entity.People">
+        SELECT * FROM people
+    </select>
+
+</mapper>

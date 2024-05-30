@@ -8,9 +8,10 @@ public class InterceptorConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new JWTInterceptor())
-                //拦截
-                .addPathPatterns("/**")
-                //放行
-                .excludePathPatterns("/admin/register","/user/login", "/admin/login");
+                .excludePathPatterns("/**");
+//                //拦截
+//                .addPathPatterns("/**")
+//                //放行
+//                .excludePathPatterns("/admin/register","/user/login", "/admin/login");
     }
 }
